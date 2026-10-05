@@ -40,7 +40,7 @@ val anixartAdsPatch = bytecodePatch(
     )
 
     execute {
-        if (removeBannerAds.value) {
+        if (removeBannerAds.value == true) {
             AdsSuppressedFingerprint.method.addInstructions(
                 0,
                 """
@@ -50,16 +50,20 @@ val anixartAdsPatch = bytecodePatch(
             )
         }
 
-        if (removeKodikPreRoll.value) {
-            val instruction = KodikAdOnCreateFingerprint.method.instructions.firstOrNull {
+        if (removeKodikPreRoll.value == true) {
+            val method = KodikAdOnCreateFingerprint.method
+            val instructions = method.implementation?.instructions
+                ?: throw PatchException("KodikAdActivity: onCreate() has no implementation")
+
+            val instruction = instructions.firstOrNull {
                 it is ReferenceInstruction &&
                     it.reference is MethodReference &&
                     (it.reference as MethodReference).name == "getLayoutInflater"
             } ?: throw PatchException("KodikAdActivity: getLayoutInflater() not found")
 
-            val index = KodikAdOnCreateFingerprint.method.instructions.indexOf(instruction)
+            val index = instructions.indexOf(instruction)
 
-            KodikAdOnCreateFingerprint.method.addInstructions(
+            method.addInstructions(
                 index,
                 """
                     invoke-virtual { p0 }, ${KODIK_AD_ACTIVITY}->advertEnded()V
@@ -68,22 +72,22 @@ val anixartAdsPatch = bytecodePatch(
             )
 
             try {
-                val getBoolean = KodikAdShowFingerprint.methodOrNull
-                    ?.instructions
-                    ?.firstOrNull {
-                        it is ReferenceInstruction &&
-                            it.reference is MethodReference &&
-                            (it.reference as MethodReference).name == "getBoolean" &&
-                            (it.reference as MethodReference).definingClass == "Landroid/content/SharedPreferences;"
-                    }
+                val showMethod = KodikAdShowFingerprint.methodOrNull
+                val showInstructions = showMethod?.implementation?.instructions
 
-                if (getBoolean != null) {
-                    val method = KodikAdShowFingerprint.methodOrNull!!
-                    val index = method.instructions.indexOf(getBoolean)
-                    val next = method.instructions[index + 1]
+                val getBoolean = showInstructions?.firstOrNull {
+                    it is ReferenceInstruction &&
+                        it.reference is MethodReference &&
+                        (it.reference as MethodReference).name == "getBoolean" &&
+                        (it.reference as MethodReference).definingClass == "Landroid/content/SharedPreferences;"
+                }
+
+                if (getBoolean != null && showMethod != null && showInstructions != null) {
+                    val index = showInstructions.indexOf(getBoolean)
+                    val next = showInstructions.getOrNull(index + 1)
 
                     if (next is OneRegisterInstruction) {
-                        method.addInstructions(
+                        showMethod.addInstructions(
                             index + 1,
                             """
                                 const/16 v${next.registerA}, 0x1
@@ -96,7 +100,7 @@ val anixartAdsPatch = bytecodePatch(
             }
         }
 
-        if (removeInterstitialAds.value) {
+        if (removeInterstitialAds.value == true) {
             fun disable(name: String, fingerprint: Fingerprint) {
                 fingerprint.methodOrNull?.addInstructions(
                     0,
