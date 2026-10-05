@@ -98,6 +98,16 @@ jobs:
             echo "resource XML files: $(find analysis/apktool/res -type f -name '*.xml' | wc -l)"
           } > analysis/statistics.txt
 
+      - name: Build MPP
+        run: ./gradlew :patches:buildAndroid --no-daemon
+
+      - name: Upload MPP
+        uses: actions/upload-artifact@v6
+        with:
+          name: anixart-10.0-mpp
+          path: patches/build/libs/*.mpp
+          if-no-files-found: error
+
       - name: Package analysis report
         run: |
           set -euxo pipefail
