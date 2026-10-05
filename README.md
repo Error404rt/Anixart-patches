@@ -25,7 +25,7 @@
 
 1. Установите оригинальный Anixart 10.0.
 2. Откройте Morphe Manager.
-3. Нажмите [Open in Morphe](https://morphe.software/add-source?github=Error404rt/Anixart-patches) или добавьте вручную https://github.com/Error404rt/Anixart-patches
+3. Нажмите [Open in Morphe](https://morphe.software/add-source?github=Error404rt/Anixart-patches)
 4. Выберите **Remove ads** и нужные параметры.
 5. Соберите и установите пропатченное приложение.
 
