@@ -1,3 +1,10 @@
+## [1.0.0-dev.3](https://github.com/Error404rt/Anixart-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-10-05)
+
+### 🐛 Bug Fixes
+
+* rename source to Anixart patches and add Open in Morphe button ([286e2ae](https://github.com/Error404rt/Anixart-patches/commit/286e2ae54400762fb0d6168aca96b5f7a8f3d358))
+* rename source to Anixart patches and add Open in Morphe button ([2db1add](https://github.com/Error404rt/Anixart-patches/commit/2db1add843dc23928660c80f7af2aa4207489a03))
+
 ## [1.0.0-dev.2](https://github.com/Error404rt/Anixart-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-10-05)
 
 ### 🐛 Bug Fixes
