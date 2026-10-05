@@ -116,4 +116,4 @@ jobs:
         with:
           name: anixart-10.0-analysis
           path: anixart-10.0-analysis.tar.gz
-          retention-days: 14
+          retention-days: 15
