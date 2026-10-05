@@ -1,3 +1,11 @@
+## [1.0.0-dev.2](https://github.com/Error404rt/Anixart-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-10-05)
+
+### 🐛 Bug Fixes
+
+* correct Kodik disclaimer fingerprints ([0df99af](https://github.com/Error404rt/Anixart-patches/commit/0df99af0ffb548a510ac0e382ea44702fedfc7c6))
+* correct Kodik disclaimer instruction position ([af51c9c](https://github.com/Error404rt/Anixart-patches/commit/af51c9cd973790bfff7a3812a209307636195e09))
+* restore exact Anixart fingerprints ([ceb8c4b](https://github.com/Error404rt/Anixart-patches/commit/ceb8c4b2c813c26cc70ef15c1425969750a0f2b3))
+
 ## 1.0.0-dev.1 (2026-10-05)
 
 ### 🐛 Bug Fixes

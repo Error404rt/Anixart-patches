@@ -7,7 +7,7 @@
 ## 🩹 Патчи
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.1](https://github.com/Error404rt/Anixart-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+> **[v1.0.0-dev.2](https://github.com/Error404rt/Anixart-patches/releases/tag/v1.0.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
 <details open>
 <summary>📦 Anixart&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -19,7 +19,7 @@
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Remove ads](#remove-ads) | Смотрите аниме без рекламы и отвлекающих факторов. | • Баннерная реклама<br>• Межстраничная реклама<br>• Реклама перед Kodik |
+| [Remove ads](#remove-ads) | Смотрите аниме без отвлекающих баннеров рекламы. | • Баннерная реклама<br>• Межстраничная реклама<br>• Реклама перед Kodik |
 
 </details>
 
