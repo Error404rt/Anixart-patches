@@ -14,11 +14,6 @@
 <summary>📦 Anixart&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
-**🎯 Supported versions:**
-
-| 10.0 |
-| :---: |
-
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Remove ads](#remove-ads) | Смотрите аниме без отвлекающих баннеров рекламы. | • Баннерная реклама<br>• Межстраничная реклама<br>• Реклама перед Kodik |
