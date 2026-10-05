@@ -1,7 +1,7 @@
 name: Build Anixart MPP
 
 on:
-  issues:
+  pull_request:
     types: [opened]
 
 permissions:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    if: github.event.issue.title == 'BUILD ANIXART MPP'
+    if: github.event.pull_request.title == 'BUILD ANIXART MPP'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
