@@ -9,7 +9,7 @@ object Constants {
         name = "Anixart",
         packageName = "com.swiftsoft.anixartd",
         apkFileType = ApkFileType.APK,
-        appIconColor = 0xFFFF4D6D,
+        appIconColor = 0xFF4D6D,
         targets = listOf(
             AppTarget(version = "10.0")
         )

@@ -10,104 +10,100 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
+// IMPORTANT: this file must not contain any dollar-sign characters.
+// Smali strings are built with plain "+" concatenation on purpose: a previous build
+// shipped the literal text of a string template into the smali compiler, which fails.
+
 @Suppress("unused")
 val anixartAdsPatch = bytecodePatch(
     name = "Remove ads",
-    description = "Смотрите аниме без рекламы и отвлекающих факторов.",
+    description = "Смотрите аниме без отвлекающих баннеров рекламы.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ANIXART)
 
-    val removeBannerAds = booleanOption(
-        key = "removeBannerAds",
+    val removeBannerAds by booleanOption(
+        key = "removeBannerAds", default = true,
         title = "Баннерная реклама",
-        description = "Убирает нижний рекламный баннер и надпись «Реклама».",
-        default = true
+        description = "Убирает нижний рекламный баннер и надпись «Реклама»."
     )
 
-    val removeInterstitialAds = booleanOption(
-        key = "removeInterstitialAds",
+    val removeInterstitialAds by booleanOption(
+        key = "removeInterstitialAds", default = true,
         title = "Межстраничная реклама",
-        description = "Блокирует рекламные interstitial-показы.",
-        default = true
+        description = "Блокирует рекламные interstitial-показы."
     )
 
-    val removeKodikPreRoll = booleanOption(
-        key = "removeKodikPreRoll",
+    val removeKodikPreRoll by booleanOption(
+        key = "removeKodikPreRoll", default = true,
         title = "Реклама перед Kodik",
-        description = "Пропускает рекламный pre-roll перед началом трансляции Kodik.",
-        default = true
+        description = "Пропускает рекламный pre-roll перед началом воспроизведения Kodik."
     )
 
     execute {
-        if (removeBannerAds.value) {
+        // 1) Banner strip + "Реклама" label: the app's own "ads suppressed" predicate returns true.
+        if (removeBannerAds != false) {
             AdsSuppressedFingerprint.method.addInstructions(
                 0,
-                """
-                    const/4 v0, 0x1
-                    return v0
-                """
+                "const/4 v0, 0x1\n" +
+                    "return v0"
             )
         }
 
-        if (removeKodikPreRoll.value) {
-            val instruction = KodikAdOnCreateFingerprint.method.instructions.firstOrNull {
-                it is ReferenceInstruction &&
-                    it.reference is MethodReference &&
-                    (it.reference as MethodReference).name == "getLayoutInflater"
-            } ?: throw PatchException("KodikAdActivity: getLayoutInflater() not found")
+        // 2) Kodik pre-roll: finish the ad activity the same way a completed ad does.
+        if (removeKodikPreRoll != false) {
+            KodikAdOnCreateFingerprint.method.let { method ->
+                val index = method.implementation!!.instructions.indexOfFirst { instruction ->
+                    val reference = (instruction as? ReferenceInstruction)?.reference as? MethodReference
+                    reference?.name == "getLayoutInflater"
+                }
+                if (index < 0) {
+                    throw PatchException("KodikAdActivity.onCreate: getLayoutInflater() call not found")
+                }
+                method.addInstructions(
+                    index,
+                    "invoke-virtual { p0 }, " + KODIK_AD_ACTIVITY + "->advertEnded()V\n" +
+                        "return-void"
+                )
+            }
 
-            val index = KodikAdOnCreateFingerprint.method.instructions.indexOf(instruction)
-
-            KodikAdOnCreateFingerprint.method.addInstructions(
-                index,
-                """
-                    invoke-virtual { p0 }, ${KODIK_AD_ACTIVITY}->advertEnded()V
-                    return-void
-                """
-            )
-
+            // 3) Skip the one-time "ad information" dialog. Optional: any failure here is not fatal.
             try {
-                val getBoolean = KodikAdShowFingerprint.methodOrNull
-                    ?.instructions
-                    ?.firstOrNull {
-                        it is ReferenceInstruction &&
-                            it.reference is MethodReference &&
-                            (it.reference as MethodReference).name == "getBoolean" &&
-                            (it.reference as MethodReference).definingClass == "Landroid/content/SharedPreferences;"
+                KodikAdShowFingerprint.methodOrNull?.let { method ->
+                    val instructions = method.implementation!!.instructions.toList()
+                    val callIndex = instructions.indexOfFirst { instruction ->
+                        val reference = (instruction as? ReferenceInstruction)?.reference as? MethodReference
+                        reference?.name == "getBoolean" &&
+                            reference.definingClass == "Landroid/content/SharedPreferences;"
                     }
-
-                if (getBoolean != null) {
-                    val method = KodikAdShowFingerprint.methodOrNull!!
-                    val index = method.instructions.indexOf(getBoolean)
-                    val next = method.instructions[index + 1]
-
-                    if (next is OneRegisterInstruction) {
+                    val moveResult = instructions.getOrNull(callIndex + 1) as? OneRegisterInstruction
+                    if (callIndex < 0 || moveResult == null) {
+                        println("[Anixart] Kodik disclaimer: getBoolean/move-result not found")
+                    } else {
+                        val register = moveResult.registerA
                         method.addInstructions(
-                            index + 1,
-                            """
-                                const/16 v${next.registerA}, 0x1
-                            """
+                            callIndex + 2,
+                            "const/16 v" + register + ", 0x1"
                         )
                     }
-                }
+                } ?: println("[Anixart] Kodik disclaimer: fingerprint not found")
             } catch (e: Exception) {
-                println("Warning: Kodik disclaimer bypass could not be applied: ${e.message}")
+                println("[Anixart] Kodik disclaimer: " + e.message)
             }
         }
 
-        if (removeInterstitialAds.value) {
+        // 4) Interstitials after the player closes.
+        if (removeInterstitialAds != false) {
             fun disable(name: String, fingerprint: Fingerprint) {
-                fingerprint.methodOrNull?.addInstructions(
-                    0,
-                    """
-                        return-void
-                    """
-                ) ?: println("Warning: $name fingerprint method not found")
+                try {
+                    fingerprint.methodOrNull?.addInstructions(0, "return-void")
+                        ?: println("[Anixart] " + name + ": fingerprint not found")
+                } catch (e: Exception) {
+                    println("[Anixart] " + name + ": " + e.message)
+                }
             }
-
-            disable("Interstitial load", InterstitialLoadFingerprint)
-            disable("Interstitial show", InterstitialShowFingerprint)
+            disable("interstitial load", InterstitialLoadFingerprint)
+            disable("interstitial show", InterstitialShowFingerprint)
         }
     }
 }
