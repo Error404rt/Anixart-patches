@@ -4,6 +4,8 @@
 
 Патч-пакет для **Anixart 10.0**, созданный **Error404rt** на базе Morphe Patches.
 
+[🇷🇺 Русский](README.md) | [🇬🇧 English](README.en.md)
+
 [![Add to Morphe](https://img.shields.io/badge/Morphe-Add%20Source-00A8FF?style=for-the-badge)](https://morphe.software/add-source?github=Error404rt/Anixart-patches)
 
 ## 🩹 Патчи
