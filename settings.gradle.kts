@@ -1,4 +1,4 @@
-rootProject.name = "morphe-patches-template"
+rootProject.name = "Error404rt-Anixart-Patches"
 
 pluginManagement {
     repositories {
