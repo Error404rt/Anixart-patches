@@ -32,15 +32,6 @@
 ## 🛠️ Разработка
 
 Проект использует Morphe Patches Template и собирается через GitHub Actions.
-
-Локальная сборка MPP:
-
-```bash
-./gradlew buildAndroid
-```
-
-Готовый файл появляется в `patches/build/libs/patches-*.mpp`.
-
 ## 📜 License
 
 GPLv3.
