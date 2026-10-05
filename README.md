@@ -7,12 +7,21 @@
 ## 🩹 Патчи
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0-dev.1](https://github.com/Error404rt/Anixart-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 Anixart&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
 
-Патч **Remove ads** позволяет отдельно управлять основными видами рекламы:
+**🎯 Supported versions:**
 
-- 🖼️ **Баннерная реклама** — убирает нижний рекламный баннер и надпись «Реклама».
-- 🚫 **Межстраничная реклама** — блокирует рекламные interstitial-показы.
-- ▶️ **Реклама перед Kodik** — пропускает рекламный pre-roll перед началом трансляции Kodik.
+| 10.0 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Remove ads](#remove-ads) | Смотрите аниме без рекламы и отвлекающих факторов. | • Баннерная реклама<br>• Межстраничная реклама<br>• Реклама перед Kodik |
+
+</details>
 
 <!-- PATCHES_END -->
 
