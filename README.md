@@ -1,8 +1,10 @@
-# 🎬 Error404rt Anixart Patches
+# 🎬 Anixart patches
 
 Смотрите аниме без рекламы и отвлекающих факторов. 🍿
 
 Патч-пакет для **Anixart 10.0**, созданный **Error404rt** на базе Morphe Patches.
+
+[![Add to Morphe](https://img.shields.io/badge/Morphe-Add%20Source-00A8FF?style=for-the-badge)](https://morphe.software/add-source?github=Error404rt/Anixart-patches)
 
 ## 🩹 Патчи
 
@@ -37,7 +39,7 @@
 
 1. Установите оригинальный Anixart 10.0.
 2. Откройте Morphe Manager.
-3. Добавьте источник **Error404rt Anixart Patches**.
+3. Нажмите [Open in Morphe](https://morphe.software/add-source?github=Error404rt/Anixart-patches) или добавьте вручную https://github.com/Error404rt/Anixart-patches
 4. Выберите **Remove ads** и нужные параметры.
 5. Соберите и установите пропатченное приложение.
 
@@ -57,6 +59,6 @@
 
 GPLv3.
 
-**Morphe Anixart Patches**
+**Anixart patches**
 
 Maintained by [Error404rt](https://github.com/Error404rt).
