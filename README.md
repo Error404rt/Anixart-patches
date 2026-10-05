@@ -21,15 +21,6 @@
 </details>
 
 <!-- PATCHES_END -->
-
-## 📱 Совместимость
-
-- **Приложение:** Anixart
-- **Package:** `com.swiftsoft.anixartd`
-- **Версия:** `10.0`
-- **Тип APK:** APK
-- **Патч:** Remove ads
-
 ## 🚀 Установка
 
 1. Установите оригинальный Anixart 10.0.
