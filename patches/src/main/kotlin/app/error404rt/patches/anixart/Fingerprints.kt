@@ -73,4 +73,3 @@ object InterstitialShowFingerprint : Fingerprint(
         )
     )
 )
-
