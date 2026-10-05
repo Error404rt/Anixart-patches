@@ -2,7 +2,7 @@ group = "app.error404rt.patches"
 
 patches {
     about {
-        name = "Error404rt Anixart Patches"
+        name = "Anixart patches"
         description = "Смотрите аниме без рекламы и отвлекающих факторов."
         source = "https://github.com/Error404rt/Anixart-patches"
         author = "Error404rt"
