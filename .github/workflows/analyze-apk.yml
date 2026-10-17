@@ -1,0 +1,135 @@
+name: Analyze Anixart APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      apk_url:
+        description: "Direct public download URL for the Anixart APK (do not include private tokens)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-apk:
+    name: Decompile APK and collect fingerprints
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Download APK for this analysis run
+        env:
+          APK_URL: ${{ inputs.apk_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-all-errors "$APK_URL" -o anixart_v10-5.apk
+          test -s anixart_v10-5.apk
+          file anixart_v10-5.apk
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p analysis/output/dex analysis/output/apktool analysis/output/jadx
+          sha256sum anixart_v10-5.apk | tee analysis/output/apk-sha256.txt
+          file anixart_v10-5.apk | tee analysis/output/apk-file.txt
+
+      - name: Install decompilation tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y apktool unzip curl
+          release_url="$(curl -fsSL https://api.github.com/repos/skylot/jadx/releases/latest | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(a["browser_download_url"] for a in d["assets"] if a["name"].endswith(".zip") and a["name"].startswith("jadx-")))')"
+          curl -fsSL "$release_url" -o /tmp/jadx.zip
+          sudo mkdir -p /opt/jadx
+          sudo unzip -q /tmp/jadx.zip -d /opt/jadx
+          sudo ln -sf /opt/jadx/bin/jadx /usr/local/bin/jadx
+          jadx --version
+
+      - name: Extract every DEX and calculate fingerprints
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -Z1 anixart_v10-5.apk | grep -E '^classes([0-9]+)?\.dex$' | sort -V > analysis/output/dex-files.txt
+          test -s analysis/output/dex-files.txt
+          while IFS= read -r dex; do
+            unzip -p anixart_v10-5.apk "$dex" > "analysis/output/dex/$dex"
+          done < analysis/output/dex-files.txt
+          sha256sum analysis/output/dex/*.dex | tee analysis/output/dex-sha256.txt
+          {
+            echo "# APK metadata"
+            echo
+            echo "- File: downloaded Anixart APK"
+            echo "- Size: $(stat -c '%s' anixart_v10-5.apk) bytes"
+            echo "- DEX count: $(wc -l < analysis/output/dex-files.txt)"
+            echo
+            echo "## DEX entries"
+            cat analysis/output/dex-files.txt
+            echo
+            echo "## APK package/version"
+            apktool d -f anixart_v10-5.apk -o analysis/output/apktool >/dev/null
+            grep -E '^[[:space:]]*package=|^[[:space:]]*android:versionName=|^[[:space:]]*android:versionCode=' analysis/output/apktool/apktool.yml || true
+          } | tee analysis/output/summary.md
+
+      - name: Decode APK to Smali
+        run: apktool d -f anixart_v10-5.apk -o analysis/output/apktool
+
+      - name: Decompile to Java-like source
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          jadx --no-res -d analysis/output/jadx anixart_v10-5.apk 2>&1 | tee analysis/output/jadx.log
+          jadx_status=${PIPESTATUS[0]}
+          set -e
+          echo "$jadx_status" > analysis/output/jadx-exit-code.txt
+
+          # JADX returns exit code 3 when individual classes cannot be reconstructed.
+          # Keep partial sources if they exist; Smali from apktool remains authoritative.
+          if ! find analysis/output/jadx -type f -name '*.java' -print -quit | grep -q .; then
+            echo "JADX produced no Java sources; see jadx.log" >&2
+            exit 1
+          fi
+          if [ "$jadx_status" -ne 0 ]; then
+            printf 'JADX returned %s after emitting partial Java sources; inspect jadx.log. The complete Smali decode is retained.\n' "$jadx_status" \
+              | tee analysis/output/JADX_PARTIAL_DECOMPILATION.txt
+          fi
+
+      - name: Collect target class and method evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "# Existing patch target search"
+            echo
+            for term in \
+              'DisplayCompat' \
+              'KodikAdActivity' \
+              'KodikInterface' \
+              'EpisodesFragment' \
+              'InterstitialAdLoader' \
+              'InterstitialAd' \
+              'loadAd' \
+              'advertEnded' \
+              'onShowKodikAd'; do
+              echo "## $term"
+              grep -R -n -F --include='*.smali' --include='*.java' "$term" analysis/output/apktool analysis/output/jadx || true
+              echo
+            done
+          } > analysis/output/fingerprint-search.txt
+
+      - name: Upload complete analysis bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: anixart-apk-analysis
+          path: analysis/output/
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 7
