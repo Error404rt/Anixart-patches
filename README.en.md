@@ -31,6 +31,10 @@ Patch bundle created by **Error404rt** using Morphe Patches.
 
 <!-- PATCHES_END -->
 
+### Always show other sources
+
+This patch for Anixart 10.5 shows **Search for other options** even when the app would list only official services. The button starts Anixart's built-in search. The patch does not change network settings or guarantee that a provider's videos are reachable.
+
 ## 📱 Compatibility
 
 - **Current release:** v2.0.0

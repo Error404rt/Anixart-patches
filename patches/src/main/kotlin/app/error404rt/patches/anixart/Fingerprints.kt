@@ -73,3 +73,14 @@ object InterstitialShowFingerprint : Fingerprint(
         )
     )
 )
+
+private const val STREAMING_CONTROLLER =
+    "Lcom/swiftsoft/anixartd/ui/controller/main/streaming/ReleaseStreamingPlatformUiController"
+
+internal object StreamingResultsFingerprint : Fingerprint(
+    definingClass = STREAMING_CONTROLLER + ";",
+    name = "buildModels",
+    returnType = "V",
+    parameters = listOf("J", "Ljava/util/List;", "Z", "J", STREAMING_CONTROLLER + "\$Listener;"),
+    strings = listOf("releaseThirdPartyPlatform"),
+)
